@@ -39,11 +39,12 @@ namespace StudentExercises.Models.ViewModels
                     Value = cohort.Id.ToString()
                 })
                 .ToList();
-                Cohorts.Insert(0, new SelectListItem
-                {
-                    Text = "Choose cohort...",
-                    Value = "0"
-                });
+
+            Cohorts.Insert(0, new SelectListItem
+            {
+                Text = "Choose cohort...",
+                Value = "0"
+            });
         }
 
         private List<Cohort> GetAllCohorts()
@@ -57,7 +58,7 @@ namespace StudentExercises.Models.ViewModels
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Cohort> cohorts = new List<Cohort>();
-                    if (reader.Read())
+                    while (reader.Read())
                     {
                         cohorts.Add(new Cohort
                         {
