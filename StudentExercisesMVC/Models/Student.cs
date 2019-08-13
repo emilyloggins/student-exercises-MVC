@@ -8,9 +8,9 @@ namespace StudentExercisesMVC.Models
 {
     public class Student
     {
-        [Required]
         [Display(Name = "Student Id")]
-        public int StudentId { get; set; }
+        //int? means the default value will be null, thus it is not "required"
+        public int? StudentId { get; set; }
 
         [Required]
         [Display(Name = "First Name")]
