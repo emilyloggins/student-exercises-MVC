@@ -14,27 +14,25 @@ namespace StudentExercisesMVC.Models
 
         [Required]
         [Display(Name = "First Name")]
-
+        [MaxLength(20)]
         public string FirstName { get; set; }
 
         [Required]
         [Display(Name = "Last Name")]
-
+        [MaxLength(20)]
         public string LastName { get; set; }
 
         [Required]
+        [MinLength(2)]
         [Display(Name = "Slack Handle")]
 
         public string SlackHandle { get; set; }
 
         [Required]
         [Display(Name = "Cohort Id")]
-
         public int CohortId { get; set; }
 
-        [Required]
         [Display(Name = "Full Name")]
-
         public string FullName
         {
             get
