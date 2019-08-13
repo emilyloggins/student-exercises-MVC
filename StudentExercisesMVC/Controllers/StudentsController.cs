@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using StudentExercises.Models;
 using StudentExercises.Models.ViewModels;
 using StudentExercisesMVC.Models;
 
-namespace StudentExercisesMVC.Controllers
+namespace StudentExercises.Controllers
 {
     public class StudentsController : Controller
     {
@@ -27,11 +28,11 @@ namespace StudentExercisesMVC.Controllers
                 return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             }
         }
+
         // GET: Students
         public ActionResult Index()
         {
             var students = new List<Student>();
-
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
@@ -41,6 +42,7 @@ namespace StudentExercisesMVC.Controllers
                         SELECT Id, FirstName, LastName, SlackHandle, CohortId
                         FROM Student
                     ";
+
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
@@ -56,8 +58,9 @@ namespace StudentExercisesMVC.Controllers
                     }
                     reader.Close();
                 }
-            return View(students);
             }
+
+            return View(students);
         }
 
         // GET: Students/Details/5
@@ -70,9 +73,9 @@ namespace StudentExercisesMVC.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                    SELECT Id, FirstName, LastName, SlackHandle, CohortId
-                    FROM Student
-                    WHERE id = @id
+                        SELECT Id, FirstName, LastName, SlackHandle, CohortId
+                        FROM Student
+                        WHERE Id = @id
                     ";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -86,15 +89,17 @@ namespace StudentExercisesMVC.Controllers
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
+                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
                         };
                     }
                 }
             }
+
             return View(student);
         }
 
         // GET: Students/Create
+        [HttpGet]
         public ActionResult Create()
         {
             var viewModel = new StudentCreateViewModel(_config.GetConnectionString("DefaultConnection"));
@@ -116,16 +121,18 @@ namespace StudentExercisesMVC.Controllers
                     {
                         cmd.CommandText = @"
                             INSERT INTO Student (
-                            FirstName,
-                            LastName,
-                            SlackHandle,
-                            CohortId)
-                            VALUES (
-                            @firstName,
-                            @lastName,
-                            @slackHandle,
-                            @cohortId)
+                                FirstName, 
+                                LastName, 
+                                SlackHandle,
+                                CohortId
+                            ) VALUES (
+                                @firstName,
+                                @lastName,
+                                @slackHandle,
+                                @cohortId
+                            )
                         ";
+
                         cmd.Parameters.AddWithValue("@firstName", student.FirstName);
                         cmd.Parameters.AddWithValue("@lastName", student.LastName);
                         cmd.Parameters.AddWithValue("@slackHandle", student.SlackHandle);
@@ -134,7 +141,8 @@ namespace StudentExercisesMVC.Controllers
                         cmd.ExecuteNonQuery();
                     }
                 }
-            return RedirectToAction(nameof(Index));
+
+                return RedirectToAction(nameof(Index));
             }
             catch
             {
@@ -151,34 +159,11 @@ namespace StudentExercisesMVC.Controllers
         // POST: Students/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Student student)
+        public ActionResult Edit(int id, IFormCollection collection)
         {
             try
             {
-                using (SqlConnection conn = Connection)
-                    {
-                    conn.Open();
-
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = @"
-                            INSERT INTO Student (
-                            FirstName,
-                            LastName,
-                            SlackHandle,
-                            CohortId)
-                            VALUES (
-                            @firstName,
-                            @lastName,
-                            @slackHandle,
-                            @cohortId)
-                        ";
-                        cmd.Parameters.AddWithValue("@firstName", student.FirstName);
-                        cmd.Parameters.AddWithValue("@lastName", student.LastName);
-                        cmd.Parameters.AddWithValue("@slackHandle", student.SlackHandle);
-                        cmd.Parameters.AddWithValue("@cohortId", student.CohortId);
-                    }
-                    }
+                // TODO: Add update logic here
 
                 return RedirectToAction(nameof(Index));
             }
