@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using StudentExercises.Models.ViewModels;
 using StudentExercisesMVC.Models;
 
 namespace StudentExercisesMVC.Controllers
@@ -96,19 +97,44 @@ namespace StudentExercisesMVC.Controllers
         // GET: Students/Create
         public ActionResult Create()
         {
-            return View();
+            var viewModel = new StudentCreateViewModel(_config.GetConnectionString("DefaultConnection"));
+            return View(viewModel);
         }
 
         // POST: Students/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Student student)
         {
             try
             {
-                // TODO: Add insert logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
 
-                return RedirectToAction(nameof(Index));
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                            INSERT INTO Student (
+                            FirstName,
+                            LastName,
+                            SlackHandle,
+                            CohortId)
+                            VALUES (
+                            @firstName,
+                            @lastName,
+                            @slackHandle,
+                            @cohortId)
+                        ";
+                        cmd.Parameters.AddWithValue("@firstName", student.FirstName);
+                        cmd.Parameters.AddWithValue("@lastName", student.LastName);
+                        cmd.Parameters.AddWithValue("@slackHandle", student.SlackHandle);
+                        cmd.Parameters.AddWithValue("@cohortId", student.CohortId);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            return RedirectToAction(nameof(Index));
             }
             catch
             {
@@ -125,11 +151,34 @@ namespace StudentExercisesMVC.Controllers
         // POST: Students/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Student student)
         {
             try
             {
-                // TODO: Add update logic here
+                using (SqlConnection conn = Connection)
+                    {
+                    conn.Open();
+
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                            INSERT INTO Student (
+                            FirstName,
+                            LastName,
+                            SlackHandle,
+                            CohortId)
+                            VALUES (
+                            @firstName,
+                            @lastName,
+                            @slackHandle,
+                            @cohortId)
+                        ";
+                        cmd.Parameters.AddWithValue("@firstName", student.FirstName);
+                        cmd.Parameters.AddWithValue("@lastName", student.LastName);
+                        cmd.Parameters.AddWithValue("@slackHandle", student.SlackHandle);
+                        cmd.Parameters.AddWithValue("@cohortId", student.CohortId);
+                    }
+                    }
 
                 return RedirectToAction(nameof(Index));
             }
